@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const Todo = require('./models/Todo');
 
 const app = express();
@@ -10,7 +11,13 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('../frontend'));
+
+// Serve frontend (static files)
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -43,11 +50,11 @@ app.get('/api/todos', async (req, res) => {
 app.post('/api/todos', async (req, res) => {
   try {
     const { title, status, priority, category, dueDate } = req.body;
-    
+
     if (!title || title.trim() === '') {
       return res.status(400).json({ error: 'Title is required' });
     }
-    
+
     const todo = new Todo({
       title: title.trim(),
       status: status || 'todo',
@@ -55,7 +62,7 @@ app.post('/api/todos', async (req, res) => {
       category: category || 'general',
       dueDate: dueDate || null
     });
-    
+
     const savedTodo = await todo.save();
     res.status(201).json(savedTodo);
   } catch (error) {
@@ -68,28 +75,28 @@ app.post('/api/todos', async (req, res) => {
 app.put('/api/todos/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'Invalid todo ID' });
     }
-    
+
     const updates = {};
     if (req.body.title !== undefined) updates.title = req.body.title.trim();
     if (req.body.status !== undefined) updates.status = req.body.status;
     if (req.body.priority !== undefined) updates.priority = req.body.priority;
     if (req.body.category !== undefined) updates.category = req.body.category;
     if (req.body.dueDate !== undefined) updates.dueDate = req.body.dueDate;
-    
+
     const updatedTodo = await Todo.findByIdAndUpdate(
       id,
       updates,
       { new: true, runValidators: true }
     );
-    
+
     if (!updatedTodo) {
       return res.status(404).json({ error: 'Todo not found' });
     }
-    
+
     res.json(updatedTodo);
   } catch (error) {
     console.error('Error updating todo:', error);
@@ -101,17 +108,17 @@ app.put('/api/todos/:id', async (req, res) => {
 app.delete('/api/todos/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'Invalid todo ID' });
     }
-    
+
     const deletedTodo = await Todo.findByIdAndDelete(id);
-    
+
     if (!deletedTodo) {
       return res.status(404).json({ error: 'Todo not found' });
     }
-    
+
     res.json({ message: 'Todo deleted successfully', todo: deletedTodo });
   } catch (error) {
     console.error('Error deleting todo:', error);
@@ -123,9 +130,9 @@ app.delete('/api/todos/:id', async (req, res) => {
 app.delete('/api/todos', async (req, res) => {
   try {
     const result = await Todo.deleteMany({});
-    res.json({ 
-      message: 'All todos cleared successfully', 
-      deletedCount: result.deletedCount 
+    res.json({
+      message: 'All todos cleared successfully',
+      deletedCount: result.deletedCount
     });
   } catch (error) {
     console.error('Error clearing todos:', error);
@@ -133,8 +140,8 @@ app.delete('/api/todos', async (req, res) => {
   }
 });
 
-// 404 handler
-app.use((req, res) => {
+// 404 handler (API only; let frontend handle non-API routes)
+app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
