@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Professional task management application">
+  <title>Todo Manager Pro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <!-- Theme Controls -->
+  <div class="theme-controls">
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+      <span class="icon-sun">☀️</span>
+      <span class="icon-moon">🌙</span>
+    </button>
+    
+    <div class="color-themes">
+      <button class="color-theme-btn active" data-theme="default" aria-label="Purple theme">
+        <span class="theme-color" style="background: linear-gradient(135deg, #667eea, #764ba2)"></span>
+      </button>
+      <button class="color-theme-btn" data-theme="ocean" aria-label="Ocean theme">
+        <span class="theme-color" style="background: linear-gradient(135deg, #2E3192, #1BFFFF)"></span>
+      </button>
+      <button class="color-theme-btn" data-theme="sunset" aria-label="Sunset theme">
+        <span class="theme-color" style="background: linear-gradient(135deg, #FF512F, #F09819)"></span>
+      </button>
+      <button class="color-theme-btn" data-theme="forest" aria-label="Forest theme">
+        <span class="theme-color" style="background: linear-gradient(135deg, #134E5E, #71B280)"></span>
+      </button>
+      <button class="color-theme-btn" data-theme="rose" aria-label="Rose theme">
+        <span class="theme-color" style="background: linear-gradient(135deg, #EC008C, #FC6767)"></span>
+      </button>
+      <button class="color-theme-btn" data-theme="midnight" aria-label="Midnight theme">
+        <span class="theme-color" style="background: linear-gradient(135deg, #000428, #004e92)"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  
+  <!-- Main Application -->
+  <main class="app-container">
+    
+    <!-- Header Section -->
+    <header class="app-header">
+      <h1 class="app-title">
+        <span class="title-icon">✨</span>
+        Todo Manager Pro
+      </h1>
+      <p class="app-subtitle">Professional task management made simple</p>
+      
+      <!-- Overall Progress -->
+      <div class="progress-wrapper">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <span class="progress-label" id="progressText">0% Complete</span>
+      </div>
+    </header>
+    
+    <!-- Action Toolbar -->
+    <section class="action-toolbar">
+      <button id="exportBtn" class="toolbar-btn" title="Export all tasks to JSON file">
+        <span class="btn-icon">💾</span>
+        <span class="btn-text">Export Data</span>
+      </button>
+      <button id="importBtn" class="toolbar-btn" title="Import tasks from JSON file">
+        <span class="btn-icon">📂</span>
+        <span class="btn-text">Import Data</span>
+      </button>
+      <button id="clearDbBtn" class="toolbar-btn toolbar-btn-danger" title="Clear all tasks from database">
+        <span class="btn-icon">🗑️</span>
+        <span class="btn-text">Clear All</span>
+      </button>
+    </section>
+    
+    <!-- Statistics Cards -->
+    <section class="stats-grid" aria-label="Task statistics">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-value" id="totalCount">0</div>
+          <div class="stat-label">Total Tasks</div>
+        </div>
+      </div>
+      <div class="stat-card stat-card-todo">
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <div class="stat-value" id="todoCount">0</div>
+          <div class="stat-label">To Do</div>
+        </div>
+      </div>
+      <div class="stat-card stat-card-progress">
+        <div class="stat-icon">⚙️</div>
+        <div class="stat-content">
+          <div class="stat-value" id="progressCount">0</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+      </div>
+      <div class="stat-card stat-card-completed">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-value" id="completedCount">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Search and Sort Controls -->
+    <section class="control-panel">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="search" 
+          id="searchInput" 
+          class="search-input"
+          placeholder="Search tasks..."
+          aria-label="Search tasks"
+        >
+      </div>
+      
+      <div class="sort-wrapper">
+        <label for="sortSelect" class="sort-label">Sort by:</label>
+        <select id="sortSelect" class="sort-select" aria-label="Sort tasks">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="priority">Priority (High→Low)</option>
+          <option value="dueDate">Due Date</option>
+        </select>
+      </div>
+    </section>
+    
+    <!-- Filter Tabs -->
+    <nav class="filter-tabs" role="tablist" aria-label="Task filters">
+      <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">All</span>
+      </button>
+      <button class="filter-tab" data-filter="todo" role="tab" aria-selected="false">
+        <span class="tab-icon">📝</span>
+        <span class="tab-label">To Do</span>
+      </button>
+      <button class="filter-tab" data-filter="progress" role="tab" aria-selected="false">
+        <span class="tab-icon">⚙️</span>
+        <span class="tab-label">In Progress</span>
+      </button>
+      <button class="filter-tab" data-filter="completed" role="tab" aria-selected="false">
+        <span class="tab-icon">✅</span>
+        <span class="tab-label">Completed</span>
+      </button>
+    </nav>
+    
+    <!-- Add Task Form -->
+    <section class="add-task-section">
+      <h2 class="section-title visually-hidden">Add New Task</h2>
+      
+      <div class="task-input-wrapper">
+        <input 
+          type="text" 
+          id="todoInput" 
+          class="task-input"
+          placeholder="What needs to be done? 🎯"
+          aria-label="Task title"
+          maxlength="200"
+        >
+      </div>
+      
+      <div class="task-options-grid">
+        <div class="input-group">
+          <label for="prioritySelect" class="input-label">Priority</label>
+          <select id="prioritySelect" class="input-select">
+            <option value="low">🟢 Low Priority</option>
+            <option value="medium" selected>🟡 Medium Priority</option>
+            <option value="high">🔴 High Priority</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="categorySelect" class="input-label">Category</label>
+          <select id="categorySelect" class="input-select">
+            <option value="general">📋 General</option>
+            <option value="work">💼 Work</option>
+            <option value="personal">👤 Personal</option>
+            <option value="shopping">🛒 Shopping</option>
+            <option value="health">💪 Health</option>
+            <option value="study">📚 Study</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="dueDateInput" class="input-label">Due Date</label>
+          <input 
+            type="date" 
+            id="dueDateInput" 
+            class="input-select"
+            aria-label="Due date"
+          >
+        </div>
+        
+        <button id="addBtn" class="btn-add" aria-label="Add task">
+          <span class="btn-icon">+</span>
+          <span class="btn-text">Add Task</span>
+        </button>
+      </div>
+    </section>
+    
+    <!-- Task List -->
+    <section class="task-list-section">
+      <h2 class="section-title visually-hidden">Task List</h2>
+      <ul id="todoList" class="task-list" role="list"></ul>
+    </section>
+    
+  </main>
+
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  
+  <!-- Undo Snackbar -->
+  <div id="undoSnackbar" class="undo-snackbar" role="alert">
+    <span id="undoMessage" class="undo-message"></span>
+    <button id="undoBtn" class="undo-button">Undo</button>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessage">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button id="modalCancel" class="modal-btn modal-btn-secondary">Cancel</button>
+        <button id="modalConfirm" class="modal-btn modal-btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden File Input for Import -->
+  <input type="file" id="fileInput" accept=".json" style="display: none;" aria-hidden="true">
+  
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
