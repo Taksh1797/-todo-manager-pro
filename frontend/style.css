@@ -1462,3 +1462,22 @@ body {
     text-align: center;
   }
 }
+/* Color theme popover overlap fix */
+
+.color-theme-popover {
+  max-width: 90vw;
+  inset-inline: auto;
+}
+
+/* On small screens, move it lower and a bit right */
+@media (max-width: 600px) {
+  .color-theme-popover {
+    top: 80px;          /* push it down below the title */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .theme-toggle-wrapper {
+    margin-top: 12px;   /* give some breathing room around the moon icon */
+  }
+}
