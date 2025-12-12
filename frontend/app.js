@@ -10,7 +10,7 @@
 // ============================================================================
 
 const CONFIG = {
-  API_BASE_URL: 'http://localhost:5000/api',
+  API_BASE_URL: '/api',
   TOAST_DURATION: 3000,
   UNDO_DURATION: 5000,
   ANIMATION_DURATION: 300,
