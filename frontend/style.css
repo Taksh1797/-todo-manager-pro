@@ -1469,15 +1469,33 @@ body {
   inset-inline: auto;
 }
 
-/* On small screens, move it lower and a bit right */
-@media (max-width: 600px) {
-  .color-theme-popover {
-    top: 80px;          /* push it down below the title */
-    left: 50%;
-    transform: translateX(-50%);
+/* Default desktop layout can stay as you have now */
+
+/* Tablet & mobile: stack theme controls above title */
+@media (max-width: 1024px) {
+  .app-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
   }
 
   .theme-toggle-wrapper {
-    margin-top: 12px;   /* give some breathing room around the moon icon */
+    order: 0;
+    margin-top: 8px;
+  }
+
+  .app-title {
+    order: 1;
+    margin-top: 4px;
+  }
+
+  /* Popover position for small screens */
+  .color-theme-popover {
+    top: 64px;             /* below moon / strip */
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 90vw;
   }
 }
